@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Quality Dashboard</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #56CCF2, #2F80ED);
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Water Droplet Animation */
+        .water-drop {
+            position: absolute;
+            top: -10px;
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: fall 3s infinite linear;
+        }
+
+        @keyframes fall {
+            0% {
+                top: -10px;
+                opacity: 1;
+            }
+            100% {
+                top: 100%;
+                opacity: 0;
+            }
+        }
+
+        /* Randomized Water Drop Positions */
+        .water-drop:nth-child(odd) {
+            animation-duration: 3.5s;
+            animation-delay: -1.5s;
+            left: 10%;
+        }
+
+        .water-drop:nth-child(even) {
+            animation-duration: 4s;
+            animation-delay: -2s;
+            left: 30%;
+        }
+
+        .water-drop:nth-child(3n) {
+            animation-duration: 4.2s;
+            animation-delay: -0.8s;
+            left: 50%;
+        }
+
+        .water-drop:nth-child(4n) {
+            animation-duration: 3.8s;
+            animation-delay: -1.2s;
+            left: 70%;
+        }
+
+        .water-drop:nth-child(5n) {
+            animation-duration: 4.3s;
+            animation-delay: -2.5s;
+            left: 90%;
+        }
+
+        /* Dashboard Container */
+        .dashboard {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            width: 90%;
+            max-width: 500px;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeIn 2s 0.5s forwards;
+        }
+
+        /* Data Cards */
+        .data-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, background-color 0.3s;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+
+        .data-box:nth-child(1) {
+            animation-delay: 0.5s;
+        }
+
+        .data-box:nth-child(2) {
+            animation-delay: 1s;
+        }
+
+        .data-box:nth-child(3) {
+            animation-delay: 1.5s;
+        }
+
+        .data-box:nth-child(4) {
+            animation-delay: 2s;
+        }
+
+        .data-box:hover {
+            transform: scale(1.05);
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .label {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffe600;
+            transition: color 0.3s ease;
+        }
+
+        /* Animation Keyframes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Floating Effect for Values */
+        @keyframes floating {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        /* Refresh Button */
+        .refresh-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2F80ED;
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background-color: #56CCF2;
+        }
+
+        /* Garfield Animation */
+        .garfield-container {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            width: 150px;
+            height: 200px;
+            animation: garfieldBounce 3s infinite ease-in-out;
+        }
+
+        @keyframes garfieldBounce {
+            0% {
+                transform: translateY(-50%) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-60%) rotate(5deg);
+            }
+            50% {
+                transform: translateY(-50%) rotate(0deg);
+            }
+            75% {
+                transform: translateY(-40%) rotate(-5deg);
+            }
+            100% {
+                transform: translateY(-50%) rotate(0deg);
+            }
+        }
+
+        .garfield {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .garfield-head {
+            position: absolute;
+            width: 100px;
+            height: 90px;
+            background-color: #FF8C00;
+            border-radius: 50%;
+            top: 20px;
+            left: 25px;
+            z-index: 2;
+        }
+
+        .garfield-face {
+            position: absolute;
+            width: 80px;
+            height: 70px;
+            background-color: #FFA500;
+            border-radius: 40% 40% 50% 50%;
+            top: 30px;
+            left: 35px;
+            z-index: 3;
+        }
+
+        .garfield-eye-left, .garfield-eye-right {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            top: 45px;
+            z-index: 4;
+        }
+
+        .garfield-eye-left {
+            left: 45px;
+        }
+
+        .garfield-eye-right {
+            left: 85px;
+        }
+
+        .garfield-pupil-left, .garfield-pupil-right {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: black;
+            border-radius: 50%;
+            top: 50px;
+            z-index: 5;
+            animation: blinking 4s infinite;
+        }
+
+        .garfield-pupil-left {
+            left: 50px;
+        }
+
+        .garfield-pupil-right {
+            left: 90px;
+        }
+
+        @keyframes blinking {
+            0%, 48%, 52%, 100% {
+                transform: scaleY(1);
+            }
+            50% {
+                transform: scaleY(0.1);
+            }
+        }
+
+        .garfield-nose {
+            position: absolute;
+            width: 15px;
+            height: 10px;
+            background-color: #FF6347;
+            border-radius: 50%;
+            top: 60px;
+            left: 67px;
+            z-index: 4;
+        }
+
+        .garfield-mouth {
+            position: absolute;
+            width: 30px;
+            height: 10px;
+            border-bottom: 3px solid #000;
+            border-radius: 50%;
+            top: 75px;
+            left: 60px;
+            z-index: 4;
+        }
+
+        .garfield-body {
+            position: absolute;
+            width: 120px;
+            height: 80px;
+            background-color: #FF8C00;
+            border-radius: 40% 40% 50% 50%;
+            top: 100px;
+            left: 15px;
+            z-index: 1;
+        }
+
+        .garfield-stripe {
+            position: absolute;
+            width: 10px;
+            height: 60px;
+            background-color: #FF4500;
+            border-radius: 5px;
+            z-index: 2;
+        }
+
+        .garfield-stripe:nth-child(1) {
+            transform: rotate(10deg);
+            left: 30px;
+            top: 105px;
+        }
+
+        .garfield-stripe:nth-child(2) {
+            transform: rotate(-5deg);
+            left: 50px;
+            top: 100px;
+        }
+
+        .garfield-stripe:nth-child(3) {
+            transform: rotate(5deg);
+            left: 70px;
+            top: 105px;
+        }
+
+        .garfield-stripe:nth-child(4) {
+            transform: rotate(-10deg);
+            left: 90px;
+            top: 100px;
+        }
+
+        .garfield-tail {
+            position: absolute;
+            width: 60px;
+            height: 15px;
+            background-color: #FF8C00;
+            border-radius: 5px;
+            top: 120px;
+            left: 115px;
+            transform: rotate(30deg);
+            transform-origin: left center;
+            z-index: 0;
+            animation: tailWag 2s infinite ease-in-out;
+        }
+
+        @keyframes tailWag {
+            0%, 100% {
+                transform: rotate(30deg);
+            }
+            50% {
+                transform: rotate(50deg);
+            }
+        }
+
+        .garfield-paw-left, .garfield-paw-right {
+            position: absolute;
+            width: 25px;
+            height: 20px;
+            background-color: #FF8C00;
+            border-radius: 50%;
+            top: 170px;
+            z-index: 2;
+        }
+
+        .garfield-paw-left {
+            left: 25px;
+        }
+
+        .garfield-paw-right {
+            left: 100px;
+        }
+
+        .speech-bubble {
+            position: absolute;
+            background-color: white;
+            border-radius: 10px;
+            padding: 10px;
+            width: 120px;
+            top: 10px;
+            left: 140px;
+            font-size: 14px;
+            color: black;
+            opacity: 0;
+            animation: bubbleAppear 10s infinite;
+        }
+
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+            border-right-color: white;
+            border-left: 0;
+            margin-top: -8px;
+            margin-left: -8px;
+        }
+
+        @keyframes bubbleAppear {
+            0%, 90%, 100% {
+                opacity: 0;
+            }
+            10%, 80% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Water Drop Elements -->
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+    <div class="water-drop"></div>
+
+    <!-- Garfield Animation -->
+    <div class="garfield-container">
+        <div class="garfield">
+            <div class="garfield-head"></div>
+            <div class="garfield-face"></div>
+            <div class="garfield-eye-left"></div>
+            <div class="garfield-eye-right"></div>
+            <div class="garfield-pupil-left"></div>
+            <div class="garfield-pupil-right"></div>
+            <div class="garfield-nose"></div>
+            <div class="garfield-mouth"></div>
+            <div class="garfield-body"></div>
+            <div class="garfield-stripe"></div>
+            <div class="garfield-stripe"></div>
+            <div class="garfield-stripe"></div>
+            <div class="garfield-stripe"></div>
+            <div class="garfield-tail"></div>
+            <div class="garfield-paw-left"></div>
+            <div class="garfield-paw-right"></div>
+            <div class="speech-bubble">I hate Mondays, but I love clean water!</div>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <h2>🌊 Water Quality Monitoring</h2>
+        <div class="data-box">
+            <span class="label">Turbidity</span>
+            <span class="value" id="turbidity">--</span>
+        </div>
+        <div class="data-box">
+            <span class="label">Water Clearness</span>
+            <span class="value" id="clearness">--</span>
+        </div>
+        <div class="data-box">
+            <span class="label">pH Level</span>
+            <span class="value" id="pH">--</span>
+        </div>
+        <div class="data-box">
+            <span class="label">Temperature</span>
+            <span class="value" id="temperature">--</span> °C
+        </div>
+
+        <!-- Refresh Button -->
+        <button class="refresh-btn" onclick="window.location.reload();">Refresh</button>
+    </div>
+
+    <script type="module">
+        // Import Firebase Modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAWjtNoRHlo2nlhPtUqNCFpUTfNwRfEGRM",
+            authDomain: "fir-iot-8fead.firebaseapp.com",
+            databaseURL: "https://fir-iot-8fead-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "fir-iot-8fead",
+            storageBucket: "fir-iot-8fead.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Get a reference to waterQuality data
+        const dataRef = ref(db, "waterQuality");
+
+        // Listen for real-time updates
+        onValue(dataRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                document.getElementById("turbidity").innerText = data.turbidity;
+                document.getElementById("clearness").innerText = data.clearness;
+                document.getElementById("pH").innerText = data.pH;
+                document.getElementById("temperature").innerText = data.temperature;
+
+                // Adding floating animation for values update
+                document.getElementById("turbidity").style.animation = "floating 1.5s ease-in-out";
+                document.getElementById("clearness").style.animation = "floating 1.5s ease-in-out";
+                document.getElementById("pH").style.animation = "floating 1.5s ease-in-out";
+                document.getElementById("temperature").style.animation = "floating 1.5s ease-in-out";
+            } else {
+                console.log("No data available");
+            }
+        });
+
+        // Randomize Garfield's speech bubbles
+        const garfieldQuotes = [
+            "I hate Mondays, but I love clean water!",
+            "Is this water good enough for lasagna?",
+            "Wake me up when the pH is purr-fect!",
+            "Water quality matters, even to cats!",
+            "This dashboard is almost as cool as napping!"
+        ];
+
+        function changeGarfieldQuote() {
+            const speechBubble = document.querySelector('.speech-bubble');
+            const randomQuote = garfieldQuotes[Math.floor(Math.random() * garfieldQuotes.length)];
+            speechBubble.textContent = randomQuote;
+        }
+
+        // Change quote every 10 seconds
+        setInterval(changeGarfieldQuote, 10000);
+        // Set initial quote
+        changeGarfieldQuote();
+    </script>
+
+</body>
+</html>
